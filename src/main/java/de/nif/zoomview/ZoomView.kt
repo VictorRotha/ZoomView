@@ -12,22 +12,33 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 
-const val MODE_DEFAULT = 0
-const val MODE_SCALING = 1
-const val MODE_SCROLLING = 2
+
 
 class ZoomView(mContext: Context, attrs : AttributeSet?, defStyleRes : Int) : AppCompatImageView(mContext, attrs, defStyleRes){
 
     constructor(mContext: Context, attrs: AttributeSet?) : this(mContext, attrs, 0 )
     constructor(mContext: Context) : this(mContext, null, 0 )
 
+    companion object {
+        const val SCALE_CENTER = 0
+        const val SCALE_FIT_CENTER = 1
+    }
+
+
+
     var minScale = 1.0f
     var maxScale = 6.0f
 
     var isScrollLimited = true
     var isScalable = true
+    var scaleMode = SCALE_FIT_CENTER
+
+    private val MODE_DEFAULT = 0
+    private val MODE_SCALING = 1
+    private val MODE_SCROLLING = 2
 
     private var mode : Int = MODE_DEFAULT
+
     private val scaleGestureDetector = ScaleGestureDetector(context, ScaleListener())
     private val gestureDetector = GestureDetector(context, SimpleGestureListener())
 
@@ -82,7 +93,7 @@ class ZoomView(mContext: Context, attrs : AttributeSet?, defStyleRes : Int) : Ap
         return true
     }
 
-    fun scaleImage(dScaleFactor : Float) {
+    private fun scaleImage(dScaleFactor : Float) {
 
         val px = measuredWidth / 2f
         val py = measuredHeight / 2f
@@ -105,17 +116,28 @@ class ZoomView(mContext: Context, attrs : AttributeSet?, defStyleRes : Int) : Ap
 
     }
 
-    fun applyDefaultMatrix() {
+    private fun applyDefaultMatrix() {
 
         val bmWidth = drawable.intrinsicWidth
         val bmHeight = drawable.intrinsicHeight
 
-        imageMatrix = Matrix().apply {
-            setTranslate((measuredWidth - bmWidth) * .5f, (measuredHeight - bmHeight) * .5f)
+        when (scaleMode) {
+            SCALE_CENTER ->  imageMatrix = Matrix().apply {
+                setTranslate((measuredWidth - bmWidth) * .5f, (measuredHeight - bmHeight) * .5f)
+            }
+
+            SCALE_FIT_CENTER ->  imageMatrix = Matrix().apply {
+                setTranslate((measuredWidth - bmWidth) * .5f, (measuredHeight - bmHeight) * .5f)
+                val factorX = measuredWidth.toFloat()/bmWidth
+                val factorY = measuredHeight.toFloat()/bmHeight
+                val scaleFactor = factorX.coerceAtMost(factorY)
+                postScale(scaleFactor, scaleFactor, measuredWidth / 2f, measuredHeight / 2f)
+            }
         }
+
     }
 
-    fun applyScrollLimits() {
+    private fun applyScrollLimits() {
 
         if (!isScrollLimited)
             return
@@ -168,7 +190,7 @@ class ZoomView(mContext: Context, attrs : AttributeSet?, defStyleRes : Int) : Ap
 
     }
 
-    fun scrollImage(dx: Float, dy: Float) {
+    private fun scrollImage(dx: Float, dy: Float) {
 
         imageMatrix.postTranslate(-dx, -dy)
         applyScrollLimits()
