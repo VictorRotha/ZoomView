@@ -31,6 +31,7 @@ class ZoomView(mContext: Context, attrs : AttributeSet?, defStyleRes : Int) : Ap
 
     var isScrollLimited = true
     var isScalable = true
+    var isScrollable = true
     var scaleMode = SCALE_FIT_CENTER
 
     private val MODE_DEFAULT = 0
@@ -198,7 +199,7 @@ class ZoomView(mContext: Context, attrs : AttributeSet?, defStyleRes : Int) : Ap
 
     }
 
-    inner class ScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+    private inner class ScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
 
         override fun onScale(detector: ScaleGestureDetector): Boolean {
 
@@ -219,15 +220,17 @@ class ZoomView(mContext: Context, attrs : AttributeSet?, defStyleRes : Int) : Ap
 
     }
 
-    inner class SimpleGestureListener : GestureDetector.SimpleOnGestureListener() {
+    private inner class SimpleGestureListener : GestureDetector.SimpleOnGestureListener() {
         override fun onScroll(
             e1: MotionEvent,
             e2: MotionEvent,
             dx: Float,
             dy: Float
         ): Boolean {
-            mode = MODE_SCROLLING
-            scrollImage(dx, dy)
+            if (isScrollable) {
+                mode = MODE_SCROLLING
+                scrollImage(dx, dy)
+            }
             return super.onScroll(e1, e2, dx, dy)
         }
 
