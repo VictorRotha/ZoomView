@@ -119,6 +119,8 @@ class ZoomView(mContext: Context, attrs : AttributeSet?, defStyleRes : Int) : Ap
 
     private fun applyDefaultMatrix() {
 
+        drawable ?: return
+
         val bmWidth = drawable.intrinsicWidth
         val bmHeight = drawable.intrinsicHeight
 
