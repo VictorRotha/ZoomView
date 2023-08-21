@@ -26,6 +26,38 @@ SCALE_FIT_CENTER centers image and scales the image to fit in the view
 ### setVectorDrawable(id : Int)
 sets an vector drawable as imageBitmap
 
+## Usage with glide library
+
+```kotlin
+fun loadImageToImageView(context: Context, url: String, view: ImageView) {
+
+    //Don't use this
+    Glide
+        .with(context)
+        .load(url)
+        .into(view)
+    
+    //Use that
+    Glide
+        .with(context)
+        .asBitmap()
+        .load(url)
+        .into(object : CustomTarget<Bitmap>() {
+            override fun onResourceReady(
+                resource: Bitmap,
+                transition: Transition<in Bitmap>?
+            ) {
+                view.setImageBitmap(resource)
+            }
+
+            override fun onLoadCleared(placeholder: Drawable?) {}
+
+        })
+}
+```
+
+
+
 
 
 

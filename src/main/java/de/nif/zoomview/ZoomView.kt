@@ -68,6 +68,14 @@ class ZoomView(mContext: Context, attrs : AttributeSet?, defStyleRes : Int) : Ap
 
   }
 
+    override fun setImageBitmap(bm: Bitmap?) {
+        super.setImageBitmap(bm)
+        bm?.let {
+            applyDefaultMatrix()
+            postInvalidate()
+        }
+    }
+
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
 
